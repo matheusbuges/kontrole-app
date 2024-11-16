@@ -1,0 +1,402 @@
+1. Tela de Relatórios - Android (Kotlin)
+1.1 Layout XML (Interface)
+
+
+<!-- activity_report.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Título da Tela -->
+    <TextView
+        android:id="@+id/tvReportTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Relatórios Financeiros"
+        android:textSize="20sp"
+        android:layout_gravity="center" />
+
+    <!-- Gráfico de Gastos -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Botão para Atualizar Relatório -->
+    <Button
+        android:id="@+id/btnRefreshReport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Atualizar Relatório"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center" />
+
+</LinearLayout>
+1.2 Código Kotlin (Activity)
+
+
+
+dependencies {
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
+Agora, o código da Activity para a tela de relatórios:
+
+kotlin
+Copiar código
+package com.exemplo.kontrole
+
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import androidx.appcompat.app.AppCompatActivity
+
+class ReportActivity : AppCompatActivity() {
+
+    private lateinit var pieChart: PieChart
+    private lateinit var btnRefreshReport: Button
+    private lateinit var tvReportTitle: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_report)
+
+        pieChart = findViewById(R.id.pieChart)
+        btnRefreshReport = findViewById(R.id.btnRefreshReport)
+        tvReportTitle = findViewById(R.id.tvReportTitle)
+
+        // Carregar dados no gráfico
+        loadReportData()
+
+        // Ação para atualizar o gráfico
+        btnRefreshReport.setOnClickListener {
+            loadReportData()
+        }
+    }
+
+    private fun loadReportData() {
+        // Simulação de dados de transações (deve vir de uma API ou banco de dados real)
+        val categories = listOf("Alimentação", "Transporte", "Lazer", "Saúde", "Outros")
+        val expenses = listOf(300, 150, 100, 80, 50)
+
+        val entries = mutableListOf<PieEntry>()
+        for (i in categories.indices) {
+            entries.add(PieEntry(expenses[i].toFloat(), categories[i]))
+        }
+
+        val dataSet = PieDataSet(entries, "Despesas por Categoria")
+        dataSet.setColors(intArrayOf(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_purple))
+        dataSet.valueTextSize = 16f
+
+        val data = PieData(dataSet)
+        pieChart.data = data
+        pieChart.invalidate()  // Redesenha o gráfico
+    }
+}
+
+2. Tela de Relatórios - iOS (Swift)
+
+
+2.1 Layout com SwiftUI
+
+pod 'Charts'
+
+
+swift
+Copiar código
+import SwiftUI
+import Charts
+
+struct ReportView: View {
+    @State private var categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+    @State private var expenses = [300.0, 150.0, 100.0, 80.0, 50.0]
+    
+    var body: some View {
+        VStack {
+            Text("Relatório de Despesas")
+                .font(.title)
+                .padding()
+
+            PieChartView(data: expenses, title: "Gastos por Categoria", legend: "Categoria")
+                .frame(height: 300)
+                .padding()
+
+            Button(action: {
+                // Atualizar os dados do gráfico (simulado aqui)
+                updateReportData()
+            }) {
+                Text("Atualizar Relatório")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+    
+    func updateReportData() {
+        // Aqui, você pode buscar dados atualizados de um banco de dados ou API
+        categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+        expenses = [320.0, 180.0, 120.0, 90.0, 60.0]  // Exemplo de novos dados
+    }
+}
+
+struct ReportView_Previews: PreviewProvider {
+    static var previews: some View {
+        ReportView()
+    }
+}
+2.2 Gráfico de Pizza com Charts (UIKit)
+
+
+
+import UIKit
+import Charts
+
+class ReportViewController: UIViewController {
+
+    var pieChartView: PieChartView!
+    var updateButton: UIButton!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Configura o gráfico
+        pieChartView = PieChartView()
+        pieChartView.frame = CGRect(x: 20, y: 100, width: self.view.frame.size.width - 40, height: 300)
+        self.view.addSubview(pieChartView)
+        
+        // Configura o botão para atualizar o gráfico
+        updateButton = UIButton(type: .system)
+        updateButton.frame = CGRect(x: 20, y: 420, width: self.view.frame.size.width - 40, height: 50)
+        updateButton.setTitle("Atualizar Relatório", for: .normal)
+        updateButton.addTarget(self, action: #selector(updateReportData), for: .touchUpInside)
+        self.view.addSubview(updateButton)
+        
+        // Carrega o gráfico inicial
+        loadReportData()
+    }
+
+    @objc func updateReportData() {
+        // Simula a atualização dos dados
+        let updatedExpenses = [320.0, 180.0, 120.0, 90.0, 60.0]
+        setChart(dataPoints: ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"], values: updatedExpenses)
+    }
+
+    func loadReportData() {
+        let expenses = [300.0, 150.0, 100.0, 80.0, 50.0]
+        setChart(dataPoints: ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"], values: expenses)
+    }
+
+    func setChart(dataPoints: [String], values: [Double]) {
+        var entries: [ChartDataEntry] = []
+        for i in 0..<dataPoints.count {
+            let entry = PieChart1. Tela de Relatórios - Android (Kotlin)
+1.1 Layout XML (Interface)
+
+
+
+<!-- activity_report.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Título da Tela -->
+    <TextView
+        android:id="@+id/tvReportTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Relatórios Financeiros"
+        android:textSize="20sp"
+        android:layout_gravity="center" />
+
+    <!-- Gráfico de Gastos -->
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Botão para Atualizar Relatório -->
+    <Button
+        android:id="@+id/btnRefreshReport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Atualizar Relatório"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center" />
+
+</LinearLayout>
+1.2 Código Kotlin (Activity)
+
+
+gradle
+
+dependencies {
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
+
+
+kotlin
+
+package com.exemplo.kontrole
+
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import androidx.appcompat.app.AppCompatActivity
+
+class ReportActivity : AppCompatActivity() {
+
+    private lateinit var pieChart: PieChart
+    private lateinit var btnRefreshReport: Button
+    private lateinit var tvReportTitle: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_report)
+
+        pieChart = findViewById(R.id.pieChart)
+        btnRefreshReport = findViewById(R.id.btnRefreshReport)
+        tvReportTitle = findViewById(R.id.tvReportTitle)
+
+        // Carregar dados no gráfico
+        loadReportData()
+
+        // Ação para atualizar o gráfico
+        btnRefreshReport.setOnClickListener {
+            loadReportData()
+        }
+    }
+
+    private fun loadReportData() {
+        // Simulação de dados de transações (deve vir de uma API ou banco de dados real)
+        val categories = listOf("Alimentação", "Transporte", "Lazer", "Saúde", "Outros")
+        val expenses = listOf(300, 150, 100, 80, 50)
+
+        val entries = mutableListOf<PieEntry>()
+        for (i in categories.indices) {
+            entries.add(PieEntry(expenses[i].toFloat(), categories[i]))
+        }
+
+        val dataSet = PieDataSet(entries, "Despesas por Categoria")
+        dataSet.setColors(intArrayOf(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_purple))
+        dataSet.valueTextSize = 16f
+
+        val data = PieData(dataSet)
+        pieChart.data = data
+        pieChart.invalidate()  // Redesenha o gráfico
+    }
+}
+
+2. Tela de Relatórios - iOS (Swift)
+
+
+2.1 Layout com SwiftUI
+
+
+
+pod 'Charts'
+Após rodar o comando pod install, você pode usar a biblioteca no seu projeto.
+
+import SwiftUI
+import Charts
+
+struct ReportView: View {
+    @State private var categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+    @State private var expenses = [300.0, 150.0, 100.0, 80.0, 50.0]
+    
+    var body: some View {
+        VStack {
+            Text("Relatório de Despesas")
+                .font(.title)
+                .padding()
+
+            PieChartView(data: expenses, title: "Gastos por Categoria", legend: "Categoria")
+                .frame(height: 300)
+                .padding()
+
+            Button(action: {
+                // Atualizar os dados do gráfico (simulado aqui)
+                updateReportData()
+            }) {
+                Text("Atualizar Relatório")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+    
+    func updateReportData() {
+    
+        categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+        expenses = [320.0, 180.0, 120.0, 90.0, 60.0]  // Exemplo de novos dados
+    }
+}
+
+struct ReportView_Previews: PreviewProvider {
+    static var previews: some View {
+        ReportView()
+    }
+}
+2.2 Gráfico de Pizza com Charts (UIKit)
+
+
+import UIKit
+import Charts
+
+class ReportViewController: UIViewController {
+
+    var pieChartView: PieChartView!
+    var updateButton: UIButton!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // 
+        pieChartView = PieChartView()
+        pieChartView.frame = CGRect(x: 20, y: 100, width: self.view.frame.size.width - 40, height: 300)
+        self.view.addSubview(pieChartView)
+        
+        // 
+        updateButton = UIButton(type: .system)
+        updateButton.frame = CGRect(x: 20, y: 420, width: self.view.frame.size.width - 40, height: 50)
+        updateButton.setTitle("Atualizar Relatório", for: .normal)
+        updateButton.addTarget(self, action: #selector(updateReportData), for: .touchUpInside)
+        self.view.addSubview(updateButton)
+        
+        // 
+        loadReportData()
+    }
+
+    @objc func updateReportData() {
+        // 
+        let updatedExpenses = [320.0, 180.0, 120.0, 90.0, 60.0]
+        setChart(dataPoints: ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"], values: updatedExpenses)
+    }
+
+    func loadReportData() {
+        let expenses = [300.0, 150.0, 100.0, 80.0, 50.0]
+        setChart(dataPoints: ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"], values: expenses)
+    }
+
+    func setChart(dataPoints: [String], values: [Double]) {
+        var entries: [ChartDataEntry] = []
+        for i in 0..<dataPoints.count {
+            let entry = PieChart

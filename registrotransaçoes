@@ -1,0 +1,292 @@
+1. Tela de Registro de Transações - Android (Kotlin)
+
+<!-- activity_register_transaction.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/etAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Valor"
+        android:inputType="numberDecimal"
+        android:padding="12dp" />
+
+    <Spinner
+        android:id="@+id/spinnerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false" />
+
+    <Button
+        android:id="@+id/btnSaveTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salvar Transação"
+        android:padding="12dp" />
+
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
+1.2 Código Kotlin (Activity)
+
+
+kotlin
+
+// RegisterTransactionActivity.kt
+package com.exemplo.kontrole
+
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.util.*
+
+class RegisterTransactionActivity : AppCompatActivity() {
+
+    private lateinit var etAmount: EditText
+    private lateinit var spinnerCategory: Spinner
+    private lateinit var datePicker: DatePicker
+    private lateinit var btnSaveTransaction: Button
+    private lateinit var tvError: TextView
+
+    private val categories = listOf("Alimentação", "Transporte", "Lazer", "Saúde", "Outros")
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_register_transaction)
+
+        // Inicializa os componentes da UI
+        etAmount = findViewById(R.id.etAmount)
+        spinnerCategory = findViewById(R.id.spinnerCategory)
+        datePicker = findViewById(R.id.datePicker)
+        btnSaveTransaction = findViewById(R.id.btnSaveTransaction)
+        tvError = findViewById(R.id.tvError)
+
+        // Configura o Spinner de categorias
+        val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategory.adapter = categoryAdapter
+
+        // Configura o clique do botão de salvar transação
+        btnSaveTransaction.setOnClickListener {
+            val amount = etAmount.text.toString().toDoubleOrNull()
+            val category = spinnerCategory.selectedItem.toString()
+            val date = getSelectedDate()
+
+            if (amount != null && amount > 0) {
+                // Simulação de salvar transação
+                saveTransaction(amount, category, date)
+            } else {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Por favor, insira um valor válido."
+            }
+        }
+    }
+
+    private fun getSelectedDate(): String {
+        // Obtém a data selecionada no DatePicker
+        val day = datePicker.dayOfMonth
+        val month = datePicker.month + 1 // Janeiro é 0, então adicionamos 1
+        val year = datePicker.year
+
+        return "$day/$month/$year"
+    }
+
+    private fun saveTransaction(amount: Double, category: String, date: String) {
+        // Aqui você pode salvar a transação no banco de dados ou em algum outro lugar.
+        // Como exemplo, mostramos uma mensagem de sucesso.
+        Toast.makeText(this, "Transação registrada: $amount ($category) em $date", Toast.LENGTH_LONG).show()
+
+        // Limpar os campos após salvar
+        etAmount.text.clear()
+        spinnerCategory.setSelection(0)
+        tvError.visibility = View.GONE
+    }
+}
+2. Tela de Registro de Transações - iOS (Swift)
+
+
+2.1 Layout com SwiftUI
+
+import SwiftUI
+
+struct RegisterTransactionView: View {
+    @State private var amount: String = ""
+    @State private var selectedCategory: String = "Alimentação"
+    @State private var selectedDate = Date()
+    @State private var errorMessage: String = ""
+
+    let categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+
+    var body: some View {
+        VStack {
+            TextField("Valor", text: $amount)
+                .keyboardType(.decimalPad)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            Picker("Categoria", selection: $selectedCategory) {
+                ForEach(categories, id: \.self) { category in
+                    Text(category)
+                }
+            }
+            .pickerStyle(MenuPickerStyle())
+            .padding()
+
+            DatePicker("Data", selection: $selectedDate, displayedComponents: .date)
+                .padding()
+
+            Button(action: {
+                if let amountValue = Double(amount), amountValue > 0 {
+                    saveTransaction(amount: amountValue, category: selectedCategory, date: selectedDate)
+                } else {
+                    errorMessage = "Por favor, insira um valor válido."
+                }
+            }) {
+                Text("Salvar Transação")
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .padding()
+            }
+        }
+        .padding()
+    }
+
+    func saveTransaction(amount: Double, category: String, date: Date) {
+        // Aqui você pode salvar a transação no banco de dados ou em algum outro lugar.
+        // Simulação de sucesso: mostra uma mensagem no console
+        print("Transação registrada: \(amount) - \(category) em \(dateFormatter(date))")
+
+        // Limpar os campos após salvar
+        amount = ""
+        selectedCategory = categories[0]
+    }
+
+    func dateFormatter(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter.string(from: date)
+    }
+}
+2.2 Código ViewController (UIKit)
+
+
+swift
+
+import UIKit
+
+class RegisterTransactionViewController: UIViewController {
+
+    var amountTextField: UITextField!
+    var categoryPicker: UIPickerView!
+    var datePicker: UIDatePicker!
+    var saveButton: UIButton!
+    var errorLabel: UILabel!
+
+    let categories = ["Alimentação", "Transporte", "Lazer", "Saúde", "Outros"]
+    var selectedCategory: String = "Alimentação"
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Inicializa os componentes da interface
+        amountTextField = UITextField()
+        categoryPicker = UIPickerView()
+        datePicker = UIDatePicker()
+        saveButton = UIButton(type: .system)
+        errorLabel = UILabel()
+
+        // Configura a interface
+        setupUI()
+    }
+
+    func setupUI() {
+        // Configura as posições e estilos (aqui são apenas configurações básicas)
+        amountTextField.frame = CGRect(x: 20, y: 100, width: 280, height: 40)
+        categoryPicker.frame = CGRect(x: 20, y: 150, width: 280, height: 100)
+        datePicker.frame = CGRect(x: 20, y: 260, width: 280, height: 100)
+        saveButton.frame = CGRect(x: 20, y: 380, width: 280, height: 40)
+        errorLabel.frame = CGRect(x: 20, y: 430, width: 280, height: 40)
+
+        // Personaliza os componentes
+        amountTextField.placeholder = "Valor"
+        amountTextField.keyboardType = .decimalPad
+        categoryPicker.dataSource = self
+        categoryPicker.delegate = self
+        datePicker.datePickerMode = .date
+        saveButton.setTitle("Salvar Transação", for: .normal)
+        errorLabel.textColor = .red
+        errorLabel.isHidden = true
+
+        // Adiciona os componentes à tela
+        view.addSubview(amountTextField)
+        view.addSubview(categoryPicker)
+        view.addSubview(datePicker)
+        view.addSubview(saveButton)
+        view.addSubview(errorLabel)
+
+        // Configura a ação do botão
+        saveButton.addTarget(self, action: #selector(saveTransaction), for: .touchUpInside)
+    }
+
+    @objc func saveTransaction() {
+        guard let amountText = amountTextField.text, let amount = Double(amountText), amount > 0 else {
+            errorLabel.isHidden = false
+            errorLabel.text = "Por favor, insira um valor válido."
+            return
+        }
+
+        // Obtém a categoria selecionada e a data
+        let category = categories[categoryPicker.selectedRow(inComponent: 0)]
+        let date = datePicker.date
+
+        // Simula a transação salva
+        print("Transação registrada: \(amount) - \(category) em \(date)")
+
+        // Limpa os campos após salvar
+        amountTextField.text = ""
+        categoryPicker.selectRow(0, inComponent: 0, animated: true)
+        errorLabel.isHidden = true
+    }
+}
+
+extension RegisterTransactionViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return categories.count
+    }
+
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return categories[row]
+    }
+
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+}

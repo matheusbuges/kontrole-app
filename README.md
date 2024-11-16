@@ -46,4 +46,4 @@ Antes de executar o projeto, você precisa ter os seguintes softwares instalados
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/kontrole-app.git
+   git clone https://github.com/matheusbuges/kontrole-app.git

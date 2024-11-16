@@ -1,0 +1,220 @@
+. Tela de Login - Android (Kotlin)
+Interface da tela de login e a lógica de autenticação simples.
+
+1.1 Layout XML (Interface)
+No Android, o layout da tela é definido em um arquivo XML. Este é um exemplo simples de uma tela de login:
+
+xml
+
+<!-- activity_login.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome de usuário"
+        android:inputType="textEmailAddress"
+        android:padding="12dp" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Senha"
+        android:inputType="textPassword"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Entrar"
+        android:padding="12dp" />
+
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
+1.2 Código Kotlin (Activity)
+
+kotlin
+
+// LoginActivity.kt
+package com.exemplo.kontrole
+
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class LoginActivity : AppCompatActivity() {
+
+    private lateinit var etUsername: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var btnLogin: Button
+    private lateinit var tvError: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        // Inicializa os componentes da UI
+        etUsername = findViewById(R.id.etUsername)
+        etPassword = findViewById(R.id.etPassword)
+        btnLogin = findViewById(R.id.btnLogin)
+        tvError = findViewById(R.id.tvError)
+
+        // Configura o clique do botão de login
+        btnLogin.setOnClickListener {
+            val username = etUsername.text.toString()
+            val password = etPassword.text.toString()
+
+            // Simulação de login
+            if (username == "usuario" && password == "senha123") {
+                // Login bem-sucedido, abrir a próxima tela (exemplo: MainActivity)
+                // Inicie a próxima activity ou tela do seu app
+                // Intent(this, MainActivity::class.java).also { startActivity(it) }
+                tvError.visibility = View.GONE
+                // Por exemplo, mostrar um sucesso na tela
+            } else {
+                // Exibir erro caso o login seja inválido
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Usuário ou senha inválidos."
+            }
+        }
+    }
+}
+2. Tela de Login - iOS (Swift)
+
+
+2.1 Layout com SwiftUI
+
+
+swift
+
+import SwiftUI
+
+struct LoginView: View {
+    @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var errorMessage: String = ""
+
+    var body: some View {
+        VStack {
+            TextField("Nome de usuário", text: $username)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .autocapitalization(.none)
+            
+            SecureField("Senha", text: $password)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            
+            Button(action: {
+                // Simulação de login
+                if username == "usuario" && password == "senha123" {
+                    errorMessage = ""
+                    // Ação para navegação para a tela principal, por exemplo
+                    // NavigationLink(destination: MainView()) {
+                    //     Text("Entrar")
+                    // }
+                } else {
+                    errorMessage = "Usuário ou senha inválidos."
+                }
+            }) {
+                Text("Entrar")
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .padding()
+            }
+        }
+        .padding()
+    }
+}
+2.2 Código ViewController (UIKit)
+
+
+swift
+
+import UIKit
+
+class LoginViewController: UIViewController {
+
+    var usernameTextField: UITextField!
+    var passwordTextField: UITextField!
+    var loginButton: UIButton!
+    var errorLabel: UILabel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Inicializa os componentes da interface
+        usernameTextField = UITextField()
+        passwordTextField = UITextField()
+        loginButton = UIButton(type: .system)
+        errorLabel = UILabel()
+
+        // Configura a interface
+        setupUI()
+    }
+
+    func setupUI() {
+        // Configura a posição dos elementos na tela (aqui são apenas configurações básicas)
+        usernameTextField.frame = CGRect(x: 20, y: 100, width: 280, height: 40)
+        passwordTextField.frame = CGRect(x: 20, y: 150, width: 280, height: 40)
+        loginButton.frame = CGRect(x: 20, y: 200, width: 280, height: 40)
+        errorLabel.frame = CGRect(x: 20, y: 250, width: 280, height: 40)
+        
+        // Personaliza os componentes
+        usernameTextField.placeholder = "Nome de usuário"
+        passwordTextField.placeholder = "Senha"
+        passwordTextField.isSecureTextEntry = true
+        loginButton.setTitle("Entrar", for: .normal)
+        errorLabel.textColor = .red
+        errorLabel.isHidden = true
+        
+        // Ação do botão
+        loginButton.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
+        
+        // Adiciona na tela
+        view.addSubview(usernameTextField)
+        view.addSubview(passwordTextField)
+        view.addSubview(loginButton)
+        view.addSubview(errorLabel)
+    }
+
+    @objc func handleLogin() {
+        let username = usernameTextField.text ?? ""
+        let password = passwordTextField.text ?? ""
+        
+        // Simulação de login
+        if username == "usuario" && password == "senha123" {
+            errorLabel.isHidden = true
+            // Navegar para a próxima tela
+            // NavigationController.pushViewController(MainViewController(), animated: true)
+        } else {
+            errorLabel.isHidden = false
+            errorLabel.text = "Usuário ou senha inválidos."
+        }
+    }
+}
